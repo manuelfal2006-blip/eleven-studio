@@ -68,3 +68,6 @@
 
 .legal-links{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;flex-basis:100%;justify-content:flex-end}.legal-links a,.privacy-note a{text-decoration:underline;text-underline-offset:3px}.legal-links a:focus-visible{outline:2px solid var(--burgundy);outline-offset:4px}footer{flex-wrap:wrap}.legal-page{max-width:1040px;margin:auto}.legal-page h1{font-size:clamp(38px,5vw,64px);line-height:1.12}.legal-page h2{font-size:27px;letter-spacing:-.6px;margin-top:42px;line-height:1.3}.legal-page p,.legal-page li{color:#405966;line-height:1.8;overflow-wrap:anywhere}.legal-page a:not(.text-link){text-decoration:underline;text-underline-offset:3px}.legal-date{font-size:14px;margin-bottom:40px}.legal-page li{margin-bottom:12px}.legal-page .text-link{display:inline-block;margin-top:35px}@media(max-width:650px){.legal-links{justify-content:flex-start;order:4}.legal-page h2{font-size:24px}}
 
+
+/* Hide the public hosting badge for every visitor. */
+iframe#nl-badge-frame[title="Powered by Netlify"]{display:none!important}
