@@ -23,3 +23,47 @@ if('IntersectionObserver' in window && !reduceServiceMotion.matches){
     if(event.matches){motionObserver.disconnect();document.documentElement.classList.remove('motion-ready');motionCards.forEach(card=>card.classList.remove('is-active'));}
   });
 }
+
+// Small scroll cues keep native page scrolling and anchor navigation intact.
+const scrollProgress=document.createElement('div');
+scrollProgress.className='scroll-progress';
+scrollProgress.setAttribute('aria-hidden','true');
+document.body.appendChild(scrollProgress);
+const heroImage=document.querySelector('.hero-art img');
+let scrollFramePending=false;
+function updateScrollCues(){
+  scrollFramePending=false;
+  const pageRange=document.documentElement.scrollHeight-window.innerHeight;
+  const progress=pageRange>0?Math.min(1,Math.max(0,window.scrollY/pageRange)):0;
+  scrollProgress.style.transform=`scaleX(${progress})`;
+  if(heroImage){
+    const offset=reduceServiceMotion.matches?0:Math.min(28,Math.max(0,window.scrollY)*0.045);
+    heroImage.style.setProperty('--hero-scroll',`${offset}px`);
+  }
+}
+function requestScrollCues(){
+  if(!scrollFramePending){scrollFramePending=true;window.requestAnimationFrame(updateScrollCues);}
+}
+window.addEventListener('scroll',requestScrollCues,{passive:true});
+window.addEventListener('resize',requestScrollCues,{passive:true});
+window.addEventListener('pageshow',requestScrollCues);
+reduceServiceMotion.addEventListener('change',requestScrollCues);
+updateScrollCues();
+
+if('IntersectionObserver' in window && !reduceServiceMotion.matches){
+  const scrollTargets=Array.from(document.querySelectorAll('.section-top,.statement>h2,.statement>p:not(.eyebrow),.steps article,.home-guides .guide-card,.contact-copy,#contact-form,.faq>.eyebrow,.faq details'));
+  const sectionObserver=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){entry.target.classList.add('scroll-visible');sectionObserver.unobserve(entry.target);}
+    });
+  },{threshold:0.08});
+  scrollTargets.forEach((target,index)=>{
+    target.classList.add('scroll-reveal');
+    target.style.setProperty('--section-delay',`${(index%3)*0.07}s`);
+    sectionObserver.observe(target);
+  });
+  document.documentElement.classList.add('scroll-motion-ready');
+  reduceServiceMotion.addEventListener('change',event=>{
+    if(event.matches){sectionObserver.disconnect();document.documentElement.classList.remove('scroll-motion-ready');}
+  });
+}
