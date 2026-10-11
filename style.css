@@ -193,3 +193,6 @@ footer{padding:28px 5%;gap:16px}.legal-links{gap:8px 20px;align-items:center}.le
 }
 .whatsapp-float{animation:whatsapp-neon-pulse 2.4s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.whatsapp-float{animation:none}}
+
+/* Decorative notification-style dot on contact launcher. */
+.whatsapp-float::after{content:"";position:absolute;top:1px;right:1px;width:12px;height:12px;border-radius:50%;background:#ff364d;border:2px solid #fff;box-shadow:0 0 9px rgba(255,54,77,.6);pointer-events:none}
