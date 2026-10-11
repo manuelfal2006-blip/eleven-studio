@@ -185,3 +185,11 @@ footer{padding:28px 5%;gap:16px}.legal-links{gap:8px 20px;align-items:center}.le
 .wa-panel button:focus-visible,.wa-panel a:focus-visible,.wa-panel textarea:focus-visible{outline:3px solid #23dc86;outline-offset:3px}
 .wa-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:480px){.whatsapp-float{left:auto;right:max(16px,env(safe-area-inset-right))}.wa-panel{right:14px;bottom:calc(86px + env(safe-area-inset-bottom));height:480px;max-height:calc(100dvh - 112px - env(safe-area-inset-bottom))}.wa-header{padding:16px 14px}.wa-bubble p{font-size:14px}}
+
+/* Continuous soft neon pulse */
+@keyframes whatsapp-neon-pulse{
+ 0%,100%{background:#16ee76;box-shadow:0 5px 20px rgba(0,0,0,.2),0 0 12px rgba(0,255,113,.35),0 0 0 6px rgba(0,255,113,.06)}
+ 50%{background:#36ff8c;box-shadow:0 5px 20px rgba(0,0,0,.2),0 0 32px rgba(0,255,113,.8),0 0 0 12px rgba(0,255,113,.18)}
+}
+.whatsapp-float{animation:whatsapp-neon-pulse 2.4s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.whatsapp-float{animation:none}}
