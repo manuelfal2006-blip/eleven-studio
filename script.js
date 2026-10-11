@@ -17,6 +17,7 @@ if(directDelivery){
   submitButton.textContent='Invia richiesta';
   document.getElementById('form-delivery-note').textContent='Invia la richiesta direttamente dal sito. Ti risponderemo all’indirizzo email indicato.';
 }
+if(!directDelivery){submitButton.textContent='Prepara la richiesta';}
 contactForm.addEventListener('input',()=>{
   if(delivered){delivered=false;submitButton.disabled=false;formStatus.hidden=true;}
 });
