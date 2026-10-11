@@ -6,7 +6,8 @@ const contactForm=document.getElementById('contact-form');
 const submitButton=contactForm.querySelector('button[type="submit"]');
 const formStatus=document.getElementById('form-status');
 const emailFallback=document.getElementById('form-email-fallback');
-const directDelivery=!contactForm.hasAttribute('data-netlify')&&contactForm.elements.namedItem('form-name')?.value===contactForm.getAttribute('name');
+const formSubmitDelivery=contactForm.dataset.delivery==='formsubmit';
+const directDelivery=formSubmitDelivery||!contactForm.hasAttribute('data-netlify')&&contactForm.elements.namedItem('form-name')?.value===contactForm.getAttribute('name');
 let submitting=false;
 let delivered=false;
 function requestEmail(data){
@@ -17,11 +18,13 @@ if(directDelivery){
   submitButton.textContent='Invia richiesta';
   document.getElementById('form-delivery-note').textContent='Invia la richiesta direttamente dal sito. Ti risponderemo all’indirizzo email indicato.';
 }
+if(formSubmitDelivery){document.getElementById('form-delivery-note').textContent='Invia la richiesta alla nostra email tramite FormSubmit. Potrebbe esserti chiesto un controllo antispam prima di tornare al sito.';}
 if(!directDelivery){submitButton.textContent='Prepara la richiesta';}
 contactForm.addEventListener('input',()=>{
   if(delivered){delivered=false;submitButton.disabled=false;formStatus.hidden=true;}
 });
 contactForm.addEventListener('submit',async event=>{
+  if(formSubmitDelivery)return;
   event.preventDefault();
   if(submitting||delivered||!contactForm.reportValidity())return;
   const data=new FormData(contactForm);
