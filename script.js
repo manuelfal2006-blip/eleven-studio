@@ -2,7 +2,60 @@ const requestedService=new URLSearchParams(window.location.search).get("progetto
 const serviceSelect=document.getElementById("service");
 if(requestedService&&serviceSelect&&Array.from(serviceSelect.options).some(option=>option.value===requestedService)){serviceSelect.value=requestedService;}
 document.querySelectorAll('[data-service]').forEach(button=>button.addEventListener('click',()=>{document.getElementById('service').value=button.dataset.service;document.getElementById('contatti').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}));
-document.getElementById('contact-form').addEventListener('submit',event=>{event.preventDefault();const form=event.currentTarget;if(!form.reportValidity())return;const data=new FormData(form);const body=`Ciao Eleven studio,\n\nMi chiamo ${data.get('name')}.\nEmail: ${data.get('email')}\nProgetto: ${data.get('service')}\n\n${data.get('message')}\n\nVorrei parlarne con voi.`;const uri=`mailto:manuelfal2006@gmail.com?subject=${encodeURIComponent('Nuovo progetto: '+data.get('service'))}&body=${encodeURIComponent(body)}`;window.location.href=uri;const status=document.getElementById('form-status');status.hidden=false;status.textContent='La richiesta è pronta nella tua app email. Se non si apre, contattaci via WhatsApp o scrivi all’indirizzo qui accanto.';});
+const contactForm=document.getElementById('contact-form');
+const submitButton=contactForm.querySelector('button[type="submit"]');
+const formStatus=document.getElementById('form-status');
+const emailFallback=document.getElementById('form-email-fallback');
+const directDelivery=!contactForm.hasAttribute('data-netlify')&&contactForm.elements.namedItem('form-name')?.value===contactForm.getAttribute('name');
+let submitting=false;
+let delivered=false;
+function requestEmail(data){
+  const body=`Ciao Eleven studio,\n\nMi chiamo ${data.get('name')}.\nEmail: ${data.get('email')}\nProgetto: ${data.get('service')}\n\n${data.get('message')}\n\nVorrei parlarne con voi.`;
+  return `mailto:manuelfal2006@gmail.com?subject=${encodeURIComponent('Nuovo progetto: '+data.get('service'))}&body=${encodeURIComponent(body)}`;
+}
+if(directDelivery){
+  submitButton.textContent='Invia richiesta';
+  document.getElementById('form-delivery-note').textContent='Invia la richiesta direttamente dal sito. Ti risponderemo all’indirizzo email indicato.';
+}
+contactForm.addEventListener('input',()=>{
+  if(delivered){delivered=false;submitButton.disabled=false;formStatus.hidden=true;}
+});
+contactForm.addEventListener('submit',async event=>{
+  event.preventDefault();
+  if(submitting||delivered||!contactForm.reportValidity())return;
+  const data=new FormData(contactForm);
+  formStatus.hidden=false;
+  if(!directDelivery){
+    window.location.href=requestEmail(data);
+    formStatus.textContent='La richiesta è pronta nella tua app email. Se non si apre, contattaci via WhatsApp o scrivi all’indirizzo qui accanto.';
+    return;
+  }
+  submitting=true;
+  submitButton.disabled=true;
+  submitButton.textContent='Invio in corso…';
+  contactForm.setAttribute('aria-busy','true');
+  emailFallback.hidden=true;
+  formStatus.textContent='Invio della richiesta in corso…';
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),20000);
+  try{
+    const response=await fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(data).toString(),signal:controller.signal});
+    if(!response.ok)throw new Error('Submission failed');
+    delivered=true;
+    formStatus.textContent='Richiesta inviata. Grazie! Ti risponderemo all’email che hai indicato.';
+    contactForm.reset();
+  }catch(error){
+    formStatus.textContent=error.name==='AbortError'?'Non abbiamo ricevuto la conferma di invio. Per evitare duplicati, contattaci via email o WhatsApp.':'Invio non riuscito. I dati sono ancora nel modulo: puoi riprovare oppure contattarci via email o WhatsApp.';
+    emailFallback.querySelector('a').href=requestEmail(data);
+    emailFallback.hidden=false;
+  }finally{
+    clearTimeout(timeout);
+    submitting=false;
+    submitButton.disabled=delivered;
+    submitButton.textContent=delivered?'Richiesta inviata':'Invia richiesta';
+    contactForm.removeAttribute('aria-busy');
+  }
+});
 
 // Reveal once, and run illustrative animations only while their card is visible.
 const motionCards=Array.from(document.querySelectorAll('.service-list article'));
