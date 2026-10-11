@@ -1,0 +1,11 @@
+const cart=new Map();
+const money=value=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(value);
+function renderCart(){
+ const list=document.getElementById('cart-items');list.replaceChildren();let total=0,count=0;
+ for(const [id,p] of cart){total+=p.price*p.quantity;count+=p.quantity;const li=document.createElement('li');const label=document.createElement('span');label.textContent=p.name+' × '+p.quantity+' — '+money(p.price*p.quantity);const remove=document.createElement('button');remove.type='button';remove.className='remove';remove.textContent='Rimuovi';remove.setAttribute('aria-label','Rimuovi '+p.name);remove.addEventListener('click',()=>{cart.delete(id);renderCart();document.getElementById('cart-status').textContent=p.name+' rimosso.';});li.append(label,remove);list.append(li);}
+ document.getElementById('cart-total').textContent='Totale: '+money(total)+'*';document.getElementById('cart-count').textContent=count;document.getElementById('cart-empty').hidden=count>0;
+}
+document.querySelectorAll('[data-product]').forEach(button=>button.addEventListener('click',()=>{const id=button.dataset.product;const p=cart.get(id)||{name:button.dataset.name,price:Number(button.dataset.price),quantity:0};p.quantity++;cart.set(id,p);renderCart();document.getElementById('cart-status').textContent=p.name+' aggiunto al carrello.';}));
+document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));document.querySelectorAll('[data-category]').forEach(p=>p.hidden=button.dataset.filter!=='all'&&p.dataset.category!==button.dataset.filter);}));
+const choices={base:'Le basi: luce, composizione e controllo dello scatto, per chi vuole iniziare con una direzione chiara.',street:'Fotografia di strada: scene quotidiane, soggetti in movimento e composizione negli spazi urbani.',story:'Racconto visivo: costruire una sequenza di immagini, scegliere un tema e dare coerenza a una storia.'};
+document.querySelectorAll('[data-choice]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-choice]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));document.getElementById('choice-detail').textContent=choices[button.dataset.choice];}));
