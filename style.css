@@ -101,3 +101,45 @@ iframe#nl-badge-frame[title="Powered by Netlify"]{display:none!important}
 .scroll-motion-ready .scroll-reveal.scroll-visible,.scroll-motion-ready .scroll-reveal:focus-within{opacity:1;translate:0 0}
 @media(max-width:650px){.hero-art img{transform:translateY(var(--hero-scroll,0px)) scale(1.16)}.scroll-motion-ready .scroll-reveal{translate:0 16px}.scroll-motion-ready .scroll-reveal.scroll-visible,.scroll-motion-ready .scroll-reveal:focus-within{translate:0 0}}
 @media(prefers-reduced-motion:reduce){.hero-art img{transform:none}.scroll-motion-ready .scroll-reveal{opacity:1;translate:none;transition:none}}
+
+/* Smartphone layouts and touch navigation. */
+.mobile-menu{display:none}
+@media(max-width:650px){
+html{scroll-padding-top:88px}
+header{height:76px;position:sticky;top:0;z-index:90;padding:0 5%}
+header>.brand{font-size:23px;gap:7px}header>nav{display:none}
+.mobile-menu{display:block}
+.mobile-menu summary{display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 12px;border:1px solid #a2b3bc;border-radius:8px;cursor:pointer;font-size:14px;list-style:none}
+.mobile-menu summary::-webkit-details-marker{display:none}
+.mobile-menu summary::after{content:"";width:14px;height:10px;border-top:2px solid currentColor;border-bottom:2px solid currentColor}
+.mobile-menu[open] summary{background:#ffffff14}
+.mobile-menu nav{position:absolute;top:calc(100% - 1px);left:0;right:0;display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:14px 5% 20px;background:var(--sea);box-shadow:0 12px 20px #072e4130;border-top:1px solid #ffffff20}
+.mobile-menu nav a,.mobile-menu nav a:not(.nav-contact){display:flex;align-items:center;min-height:48px;padding:10px 14px;font-size:16px;border-radius:6px}.mobile-menu .nav-contact{margin-top:4px}
+.hero{padding:30px 5% 0;gap:18px;grid-template-columns:minmax(0,1fr)}
+.hero-copy,.hero-art,.contact-copy,form,.section-top,.guide-card{min-width:0}
+h1,.service-hero h1,.legal-page h1{font-size:clamp(34px,9.3vw,52px);line-height:1.12;letter-spacing:-1.3px;overflow-wrap:break-word}
+h2{font-size:clamp(32px,8.7vw,44px);line-height:1.16;letter-spacing:-1px}
+.eyebrow{line-height:1.6;letter-spacing:1.2px}.hero .intro{font-size:16px;line-height:1.75}
+.hero-actions{flex-wrap:wrap;gap:12px}
+.button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;text-align:center;padding:12px 18px;white-space:normal}
+.hero-actions .button{flex:1 1 220px}.hero-actions .text-link{display:inline-flex;align-items:center;min-height:44px}
+.hero-art{min-height:260px;height:clamp(260px,76vw,350px);margin-top:6px;border-radius:120px 120px 4px 4px}.hero-art img{transform:none}
+.art-label{font-size:9px;letter-spacing:1px;left:18px;bottom:20px}.hero-bottom{gap:16px;flex-wrap:wrap;line-height:1.5}
+.section{padding:52px 5%}.service-hero{padding:38px 5% 48px}.service-hero .intro{font-size:16px;line-height:1.75}
+.service-list article,.service-list article:last-child{display:grid;grid-template-columns:minmax(0,1fr);padding:22px 18px;gap:12px}
+.service-list .service-num{display:none}.service-list article>div{min-width:0}
+.service-list h3{font-size:24px;line-height:1.25;align-items:center;gap:10px}.service-list h3>span:last-child{min-width:0;overflow-wrap:normal}
+.service-list p{font-size:16px;line-height:1.75;margin:16px 0}
+.service-list .service-detail,.service-list button{grid-column:1;min-height:44px;justify-self:start;display:inline-flex;align-items:center}
+.service-list .service-detail{padding:7px 0}.service-list button{padding:10px 20px}
+.tags{gap:7px}.tags span{font-size:12px;line-height:1.5;padding:6px 10px}.service-demo{width:100%;max-width:100%;margin-top:18px}
+.service-body{gap:28px}.service-body h2,.content-body h2{font-size:27px;line-height:1.25}
+.statement{padding:52px 5%}.statement h2{font-size:clamp(34px,9vw,46px)}
+.guide-card h3{font-size:23px;line-height:1.35;overflow-wrap:break-word}.guide-card .text-link,.related .text-link{display:inline-flex;align-items:center;min-height:44px}.guide-grid{gap:24px}
+.contact{gap:28px;grid-template-columns:minmax(0,1fr)}.contact h2{font-size:clamp(34px,9vw,44px)}
+.contact-email{font-size:clamp(16px,4.8vw,21px);line-height:1.6;margin:24px 0 18px}.phone{display:inline-flex;align-items:center;min-height:44px}
+input,select,textarea{font-size:16px;line-height:1.5;min-height:48px;padding:12px}textarea{min-height:132px}form>.button{width:100%}.form-note{font-size:14px;line-height:1.7}
+summary{min-height:44px;line-height:1.6}.faq{padding-top:44px;padding-bottom:44px}
+.content-body p,.content-body li,.legal-page p,.legal-page li{font-size:16px;line-height:1.8}.related>div{gap:12px}
+footer{padding:28px 5%;gap:16px}.legal-links{gap:8px 20px;align-items:center}.legal-links a,.footer-blog{display:inline-flex;align-items:center;min-height:44px}
+}
