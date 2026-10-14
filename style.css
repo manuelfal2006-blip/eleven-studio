@@ -196,3 +196,17 @@ footer{padding:28px 5%;gap:16px}.legal-links{gap:8px 20px;align-items:center}.le
 
 /* Decorative notification-style dot on contact launcher. */
 .whatsapp-float::after{content:"";position:absolute;top:1px;right:1px;width:12px;height:12px;border-radius:50%;background:#ff364d;border:2px solid #fff;box-shadow:0 0 9px rgba(255,54,77,.6);pointer-events:none}
+
+/* Social invitations */
+.social-invite{display:flex;align-items:center;justify-content:space-between;gap:32px;background:#ede6e8;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.social-invite h2{font-size:clamp(32px,4vw,54px);letter-spacing:-1.7px}
+.social-invite h2 em{color:var(--burgundy)}
+.social-invite p:last-child{margin-bottom:0;max-width:520px}
+.social-invite-links{display:flex;align-items:center;gap:16px;flex-shrink:0}
+.social-icon-link{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border:1px solid currentColor;border-radius:50%;color:var(--burgundy);transition:transform .25s,background .25s,color .25s}
+.social-icon-link:hover{transform:translateY(-5px);background:var(--burgundy);color:#fff}
+.social-reminder{margin:0 5.5% 60px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;border-left:3px solid var(--burgundy);background:#ede6e8}
+.social-reminder .eyebrow{margin-bottom:8px}
+.social-reminder p:last-child{margin:0;font-size:20px}
+@media(max-width:650px){.social-invite,.social-reminder{flex-direction:column;align-items:flex-start}.social-reminder{margin-bottom:36px;padding:24px}.social-icon-link{width:52px;height:52px}}
+@media(prefers-reduced-motion:reduce){.social-icon-link{transition:none}.social-icon-link:hover{transform:none}}
