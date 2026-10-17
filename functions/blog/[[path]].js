@@ -13,6 +13,8 @@ function safeUrl(value, origin, image = false) {
 export function sanitizeElement(el, origin) {
   const tag = el.tagName.toLowerCase();
   if (!SAFE_TAGS.has(tag)) { el.remove(); return; }
+  // The page template already supplies the article's primary heading.
+  if (tag === 'h1') el.tagName = 'h2';
   const href = el.getAttribute('href'), src = el.getAttribute('src'), alt = el.getAttribute('alt');
   for (const [name] of [...el.attributes]) el.removeAttribute(name);
   if (tag === 'a') {
@@ -70,9 +72,17 @@ export async function onRequest(context) {
     const body = await sanitize(a.contentHtml, origin);
     const title = escape(a.metaTitle || a.title), description = escape(a.metaDescription || a.excerpt);
     const image = safeUrl(a.featuredImage, origin, true);
+    const structuredData = JSON.stringify({
+      '@context': 'https://schema.org', '@type': 'BlogPosting',
+      headline: a.title, description: a.metaDescription || a.excerpt,
+      datePublished: a.publishedAt, inLanguage: 'it-IT',
+      author: { '@type': 'Organization', name: 'Eleven Studio', url: `${origin}/` },
+      publisher: { '@type': 'Organization', name: 'Eleven Studio', url: `${origin}/` },
+      mainEntityOfPage: canonical, ...(image ? { image } : {})
+    }).replace(/</g, '\\u003c');
     const date = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long', timeZone: 'Europe/Rome' }).format(new Date(a.publishedAt));
     const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><meta name="description" content="${description}"><link rel="canonical" href="${escape(canonical)}"><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><meta property="og:type" content="article"><meta property="og:title" content="${title}"><meta property="og:description" content="${description}"><meta property="og:url" content="${escape(canonical)}">${image ? `<meta property="og:image" content="${escape(image)}">` : ''}<meta name="twitter:card" content="summary_large_image"><style>.content-body img{max-width:100%;height:auto}.content-body pre,.content-body table{max-width:100%;overflow:auto}.content-body{overflow-wrap:anywhere}</style></head><body>${HEADER}<main><section class="service-hero article-hero"><p class="eyebrow">ELEVEN STUDIO / GUIDE E ARTICOLI</p><h1>${escape(a.title)}</h1><p class="article-meta">Eleven Studio · <time datetime="${escape(a.publishedAt)}">${escape(date)}</time></p></section><article class="section content-body">${image ? `<img src="${escape(image)}" alt="${escape(a.title)}" decoding="async">` : ''}${body}<p><a class="button dark" href="/#contatti">Parliamo del tuo progetto</a></p></article><section class="section related"><a class="text-link" href="/blog/">Tutti gli articoli</a></section></main>${FOOTER}<script src="/mobile-nav.js" defer></script></body></html>`;
-    return htmlResponse(request.method === 'HEAD' ? null : html);
+    return htmlResponse(request.method === 'HEAD' ? null : html.replace('</head>', `<script type="application/ld+json">${structuredData}</script></head>`));
   } catch {
     console.error('holo-blog: render_failed');
     return htmlResponse('<!doctype html><html lang="it"><meta name="robots" content="noindex"><title>Articoli temporaneamente non disponibili</title><p>Riprova tra poco.</p><a href="/">Torna alla homepage</a></html>', 503, { 'Retry-After': '30' });
