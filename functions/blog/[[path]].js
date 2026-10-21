@@ -39,6 +39,18 @@ function htmlResponse(body, status = 200, extras = {}) {
     'Content-Security-Policy': "default-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'", ...extras } });
 }
 function brandFilter(env) { return env.HOLO_BRAND_ID ? [' WHERE brand_id = ?', [env.HOLO_BRAND_ID]] : ['', []]; }
+function relatedService(slug) {
+  const services = [
+    [/whatsapp/, '/assistente-ai-whatsapp/', 'Scopri l’assistente AI WhatsApp'],
+    [/telefon|chiamat/, '/assistente-ai-chiamate/', 'Scopri l’assistente AI per chiamate'],
+    [/crm/, '/crm-su-misura/', 'Scopri il CRM su misura'],
+    [/e-?commerce/, '/realizzazione-ecommerce/', 'Scopri la realizzazione e-commerce'],
+    [/landing/, '/creazione-landing-page/', 'Scopri la creazione di landing page'],
+    [/sito|web/, '/realizzazione-siti-web/', 'Scopri la realizzazione di siti web']
+  ];
+  const match = services.find(([pattern]) => pattern.test(slug));
+  return match ? { href: match[1], label: match[2] } : null;
+}
 export async function onRequest(context) {
   const { request, env, next } = context;
   if (!['GET', 'HEAD'].includes(request.method) || !env.HOLO_DB) return next();
@@ -72,6 +84,7 @@ export async function onRequest(context) {
     const body = await sanitize(a.contentHtml, origin);
     const title = escape(a.metaTitle || a.title), description = escape(a.metaDescription || a.excerpt);
     const image = safeUrl(a.featuredImage, origin, true);
+    const service = relatedService(slug);
     const structuredData = JSON.stringify({
       '@context': 'https://schema.org', '@type': 'BlogPosting',
       headline: a.title, description: a.metaDescription || a.excerpt,
@@ -81,7 +94,7 @@ export async function onRequest(context) {
       mainEntityOfPage: canonical, ...(image ? { image } : {})
     }).replace(/</g, '\\u003c');
     const date = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long', timeZone: 'Europe/Rome' }).format(new Date(a.publishedAt));
-    const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><meta name="description" content="${description}"><link rel="canonical" href="${escape(canonical)}"><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><meta property="og:type" content="article"><meta property="og:title" content="${title}"><meta property="og:description" content="${description}"><meta property="og:url" content="${escape(canonical)}">${image ? `<meta property="og:image" content="${escape(image)}">` : ''}<meta name="twitter:card" content="summary_large_image"><style>.content-body img{max-width:100%;height:auto}.content-body pre,.content-body table{max-width:100%;overflow:auto}.content-body{overflow-wrap:anywhere}</style></head><body>${HEADER}<main><section class="service-hero article-hero"><p class="eyebrow">ELEVEN STUDIO / GUIDE E ARTICOLI</p><h1>${escape(a.title)}</h1><p class="article-meta">Eleven Studio · <time datetime="${escape(a.publishedAt)}">${escape(date)}</time></p></section><article class="section content-body">${image ? `<img src="${escape(image)}" alt="${escape(a.title)}" decoding="async">` : ''}${body}<p><a class="button dark" href="/#contatti">Parliamo del tuo progetto</a></p></article><section class="section related"><a class="text-link" href="/blog/">Tutti gli articoli</a></section></main>${FOOTER}<script src="/mobile-nav.js" defer></script></body></html>`;
+    const html = `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><meta name="description" content="${description}"><link rel="canonical" href="${escape(canonical)}"><link rel="icon" href="/favicon.svg"><link rel="stylesheet" href="/style.css"><meta property="og:type" content="article"><meta property="og:title" content="${title}"><meta property="og:description" content="${description}"><meta property="og:url" content="${escape(canonical)}">${image ? `<meta property="og:image" content="${escape(image)}">` : ''}<meta name="twitter:card" content="summary_large_image"><style>.content-body img{max-width:100%;height:auto}.content-body pre,.content-body table{max-width:100%;overflow:auto}.content-body{overflow-wrap:anywhere}</style></head><body>${HEADER}<main><section class="service-hero article-hero"><p class="eyebrow">ELEVEN STUDIO / GUIDE E ARTICOLI</p><h1>${escape(a.title)}</h1><p class="article-meta">Eleven Studio · <time datetime="${escape(a.publishedAt)}">${escape(date)}</time></p></section><article class="section content-body">${image ? `<img src="${escape(image)}" alt="${escape(a.title)}" decoding="async">` : ''}${body}<p><a class="button dark" href="/#contatti">Parliamo del tuo progetto</a></p></article><section class="section related">${service ? `<a class="text-link" href="${service.href}">${service.label}</a><span aria-hidden="true"> · </span>` : ''}<a class="text-link" href="/blog/">Tutti gli articoli</a></section></main>${FOOTER}<script src="/mobile-nav.js" defer></script></body></html>`;
     return htmlResponse(request.method === 'HEAD' ? null : html.replace('</head>', `<script type="application/ld+json">${structuredData}</script></head>`));
   } catch {
     console.error('holo-blog: render_failed');
